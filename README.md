@@ -92,7 +92,7 @@ sudo vim /etc/mysql/mariadb.conf.d/50-server.cnf
 
 ## WordPress Configuration (Server1 & Server2)
 
-Lets configure Wordpress server1 & server2
+WordPress is a free, open source content management system primarily used to publish blogs on the Internet. WordPress simplifies the creation and maintenance of websites and blogs. Due to its popularity, more than a third of all websites today are powered by WordPress. It is written in PHP and uses MariaDB and/or MySQL as its database. Lets configure Wordpress server1 & server2
 
 ```
 sudo apt-get install php php-fpm php-curl php-mysql php-gd php-mbstring php-xml php-imagick php-zip php-xmlrpc -y
@@ -111,6 +111,62 @@ post_max_size = 128M
 memory_limit = 512M
 max_execution_time = 120
 ```
+Let's download the wordpress.
+
+```
+cd /var/www/html
+sudo wget https://wordpress.org/latest.tar.gz
+sudo tar -zxvf latest.tar.gz
+sudo mv /var/www/html/wordpress/wp-config-sample.php /var/www/html/wordpress/wp-config.php
+```
+
+Next, edit the WordPress configuration file and set the parameters for our database:
+
+```
+Sudo vim /var/www/html/wordpress/wp-config.php
+
+#Change the following
+define('DB_NAME', 'wordpress' ); # database name
+
+/** Database USER_NAME */ # name of the user
+define( 'DB_USER', 'wordpress' );
+
+/** Database password */ # user's password
+define( 'DB_PASSWORD', ‘wordpress’ );
+
+/** Database hostname */ # the location of our database which is located on the same server as the website so "localhost
+define( 'DB_HOST', ‘192.168.10.13’ );
+```
+Save and close the file when you are done. Next, set the appropriate permission and ownership for the WordPress directory:
+
+```
+sudo chown -R www-data:www-data /var/www/html/wordpress
+sudo chmod -R 755 /var/www/html/wordpress
+Sudo systemctl start apache2
+```
+Once done we should be able to access the wordpress home/setup page at our specifiec domain
+
+<img width="802" alt="image" src="https://github.com/Umer-c/LEMP-Stack/assets/73327307/99f0a13b-71fd-401e-ae96-c4fd6ae1e323">
+
+## Enable HTTPS on WordPress with Let's Encrypt
+
+Let's Encrypt is an organization that acts to validate the identity of entities such as websites, email addresses, businesses or individuals and bind them to cryptographic keys through the publication of electronic documents called digital certificates. Adopting the HTTPS protocol on the web is easier with the help of its certificates. Since its launch in late, 2015, Let's Encrypt has become the world's largest certificate authority, representing more currently valid certificates than all other browser-approved certificate authorities combined. As of January 2019, it had issued more than 538 million certificates for 223 million domain names.
+
+To enable the HTTPS protocol on our site, we need to install the Certbot client from Let's Encrypt on our system. We can install it by running the following command:
+
+```
+sudo apt-get install python3-certbot-nginx -y
+```
+Once the Certbot client is installed, let's run the following command to enable HTTPS on our site and follow the on screen instructioins.
+
+```
+sudo certbot --nginx -d wordpress.uasghar.cloudns.ch
+```
+we should be able to see the below certificate and now we can access our website/server at https instead of http:
+
+![image](https://github.com/Umer-c/LEMP-Stack/assets/73327307/f461335f-3784-4e3e-afa7-7ec00debd6c1)
+
+
 
 
 
