@@ -44,4 +44,73 @@ sudo systemctl restart nginx
 
 ## Maria DB Setup
 
+MariaDB is a widely used open-source relational database management system, derived from MySQL in 2009. It offers enhanced performance, security, and replication capabilities compared to MySQL. MariaDB has three main editions: Community Server, Enterprise Server, and SkySQL, catering to different levels of scalability, support, and cloud-based solutions.
+Let's start the installation
+
+```
+sudo apt update -y
+sudo apt install mariadb-server mariadb-client -y
+sudo apt install -y software-properties-common
+sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
+sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/10.6/ubuntu focal main'
+sudo apt update && sudo apt install -y mariadb-server mariadb-client
+mariadb --version
+```
+
+By default, the MariaDB database engine starts automatically during installation. We can verify this by running the command:
+
+```
+sudo systemctl status mariadb
+sudo systemctl start mariadb
+sudo systemctl enable mariadb
+```
+
+The MariaDB database comes to us with default settings that are considered present security holes that can potentially be exploited by malicious parties leading to data breaches. To resolve this issue, we need to take an additional step and harden our MariaDB instance. To improve the security of the MariaDB database engine, we need to run the mysql_secure_installation shell script as follows and then follow the on screen instructions as per your need
+
+```
+sudo mysql_secure_installation
+```
+We will now create a new user account in the database server with authentication by password and later assign privileges to the user, this is a good practice in order not to use the root user permanently as it is not secure.
+
+```
+sudo mariadb -u root -p
+Enter password:
+CREATE DATABASE wordpress;
+CREATE USER 'wordpress'@'192.168.10.11' IDENTIFIED BY 'wordpress';
+CREATE USER 'wordpress'@'192.168.10.12’ IDENTIFIED BY 'wordpress';
+GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,ALTER
+    -> ON wordpress.*
+    -> TO wordpress@192.168.10.11; #And do the same for 192.168.10.12
+FLUSH PRIVILEGES;
+EXIT;
+```
+you will need to comment out the line bind-address = 127.0.0.1 and skip-networking (if it exists)
+
+```
+sudo vim /etc/mysql/mariadb.conf.d/50-server.cnf
+```
+
+## WordPress Configuration (Server1 & Server2)
+
+Lets configure Wordpress server1 & server2
+
+```
+sudo apt-get install php php-fpm php-curl php-mysql php-gd php-mbstring php-xml php-imagick php-zip php-xmlrpc -y
+php -v
+```
+Next, let's modify the PHP configuration file and change some default settings:
+
+```
+sudo nano /etc/php/7.4/fpm/php.ini
+
+#Perform the following changes
+
+cgi.fix_pathinfo=0
+upload_max_filesize = 128M
+post_max_size = 128M
+memory_limit = 512M
+max_execution_time = 120
+```
+
+
 
