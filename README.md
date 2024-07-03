@@ -25,4 +25,20 @@ So we can go to the server's ip address to validate that everything is working. 
 
 ![image](https://github.com/Umer-c/LEMP-Stack/assets/73327307/82c6b65d-8686-40ce-b965-d3572fb71b53)
 
+### NGINX Configuration
+
+NGINX configuration files are located in the /etc/nginx/ directory and carry the .conf extension. Essentially, all we have to do is configure NGINX with instructions so that we know what type of connections to listen for and where to redirect them. Let's create a new configuration file using the text editor of our choice.
+
+```
+sudo vim /etc/nginx/conf.d/load-balancer.conf
+```
+The configuration file for me is like this, I have used ip hash so the user's sessions are persistant.
+![image](https://github.com/Umer-c/LEMP-Stack/assets/73327307/19227302-d653-406d-8f6a-fa87a21f601f)
+
+```
+sudo nginx -t
+sudo rm /etc/nginx/sites-enabled/default
+sudo systemctl restart nginx
+```
+
 
